@@ -288,21 +288,29 @@ const colorOf = (tier: string): string => TIER_COLOR[tier] ?? '#888780'
 
 const TIER_MODEL: Record<string, string> = {
   fable: 'Fable · high',
-  heavy: 'Opus · xhigh',
-  careful: 'Opus · high',
-  medium: 'Opus · medium',
-  light: 'Opus · low',
+  heavy: 'Opus · high',
+  careful: 'Sonnet · high',
+  medium: 'Sonnet · medium',
+  light: 'Haiku · medium',
 }
 
 // USD per million tokens: input, output, cache read, cache write (5-minute TTL).
 // The engine reports tokens, not money, so the panel's cost is an estimate.
+// First match wins, so versioned rows come before their family's fallback.
 const PRICES: [RegExp, [number, number, number, number]][] = [
   [/fable|mythos/, [10, 50, 0.25, 12.5]],
   [/opus-5-5/, [4, 20, 0.2, 5]],
   [/opus/, [5, 25, 0.5, 6.25]],
+  [/sonnet-4/, [3, 15, 0.3, 3.75]],
   [/sonnet/, [2, 10, 0.2, 2.5]],
-  [/haiku/, [1, 5, 0.1, 1.25]],
+  [/haiku-4/, [1, 5, 0.1, 1.25]],
+  // Haiku 5.5 cache rates assumed at the usual 0.1x / 1.25x of input.
+  [/haiku/, [0.1, 0.5, 0.01, 0.125]],
 ]
+
+// Haiku 5.5 charges 5x on a request whose prompt passes 100K tokens.
+const HAIKU_LONG_PROMPT = 100_000
+const isHaiku55 = (model: string): boolean => /haiku/i.test(model) && !/haiku-4/i.test(model)
 
 type Usage = {
   input_tokens: number
@@ -315,17 +323,20 @@ const priceOf = (model: string): [number, number, number, number] =>
   PRICES.find(([re]) => re.test(model.toLowerCase()))?.[1] ?? [4, 20, 0.2, 5]
 
 const costOf = (model: string, u: Usage): number => {
+  const prompt = (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0)
+  const k = isHaiku55(model) && prompt > HAIKU_LONG_PROMPT ? 5 : 1
   const [i, o, r, w] = priceOf(model)
   return (
     ((u.input_tokens || 0) * i +
       (u.output_tokens || 0) * o +
       (u.cache_read_input_tokens || 0) * r +
-      (u.cache_creation_input_tokens || 0) * w) /
+      (u.cache_creation_input_tokens || 0) * w) *
+    k /
     1e6
   )
 }
 
-const windowOf = (model: string): number => (/haiku/i.test(model) ? 200_000 : 1_000_000)
+const windowOf = (model: string): number => (/haiku-4/i.test(model) ? 200_000 : 1_000_000)
 
 // `savvy-careful`, or `savvy-flow:savvy-careful` when the agents ship in a plugin.
 const tierOf = (type: string): string => {

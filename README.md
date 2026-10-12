@@ -1,6 +1,16 @@
-# claude-kit
+# claude-kit (corpetty fork)
 
-My public skills and mods for [Claude Code](https://claude.com/claude-code), in one place. Every item is a standalone plugin under `plugins/`: install only what you need.
+A fork of [johnnyvizz/claude-kit](https://github.com/johnnyvizz/claude-kit). Changes from upstream:
+
+- **Worker tiers remapped** so Sonnet and Haiku carry most of the work: heavy = Opus / high, careful = Sonnet / high, medium = Sonnet / medium, light = Haiku / medium (it stops and reports when a task needs judgment). Fable stays the reserve tier.
+- **Design step** uses Anthropic's `playground` plugin (design-playground template) with `frontend-design`, instead of a `design` skill that is not published.
+- **savvy-progress** shows the new tier models for planned tasks, prices Haiku 5.5 ($0.10 / $0.50 per MTok, 5x past a 100K-token prompt) and splits out Sonnet 4.x, and gives Haiku 5.5 its 1M context window.
+
+The marketplace is named `corpetty-claude-kit` so it can be registered beside upstream's `claude-kit`.
+
+---
+
+The author's skills and mods for [Claude Code](https://claude.com/claude-code), in one place. Every item is a standalone plugin under `plugins/`: install only what you need.
 
 | Plugin | Type | What it does |
 | --- | --- | --- |
@@ -16,9 +26,9 @@ savvy-flow and savvy-progress work on their own and light up together: with both
 In Claude Code:
 
 ```
-/plugin marketplace add johnnyvizz/claude-kit
-/plugin install savvy-flow@claude-kit
-/plugin install savvy-progress@claude-kit
+/plugin marketplace add corpetty/claude-kit
+/plugin install savvy-flow@corpetty-claude-kit
+/plugin install savvy-progress@corpetty-claude-kit
 ```
 
 Restart the session afterwards. Plugin skills and agents are namespaced: the skill is `/savvy-flow:savvy-flow`, the agents `savvy-flow:savvy-careful` and so on.
@@ -26,7 +36,7 @@ Restart the session afterwards. Plugin skills and agents are namespaced: the ski
 ### By hand
 
 ```bash
-git clone https://github.com/johnnyvizz/claude-kit.git ~/claude-kit
+git clone https://github.com/corpetty/claude-kit.git ~/claude-kit
 ```
 
 **A skill** (no plugin system involved, names stay short: `/savvy-flow`, `savvy-careful`): copy its folders into your Claude Code config.

@@ -58,7 +58,7 @@ Design decisions are yours. Workers never invent UI, with one exception below.
 
 - **Small/contained UI** (a component, a state, a screen tweak): decide the design yourself and write it into the worker brief as concrete specs (structure, states, spacing/typography rules, which existing components to reuse).
 - **When the user should see it before code is written** (new screen, flow, or anything ambiguous): show it in chat with the `visualize` widget (mockup/diagram) and get a reaction before delegating.
-- **Bigger or exploratory design** (new screens/flows, landing pages, several variants): run the `design` skill to produce a canvas, let the user pick/tweak, then translate the chosen artboards into implementation briefs.
+- **Bigger or exploratory design** (new screens/flows, landing pages, several variants): run the `playground` skill with its `design-playground` template, `frontend-design` as the style guide. Make each candidate direction one of its presets and expose the decisions still open as controls. Save the HTML outside the source tree (the session scratchpad, or `docs/design/` in a new project) and open it with `xdg-open` on Linux (the skill says `open`, which is macOS only). The user tunes it and pastes the generated prompt back; translate that into implementation briefs and record the decisions (in SPEC.md for a new project). If `playground` is not installed, build the variants as one HTML mockup page (an Artifact, or the `visualize` widget for smaller sets) instead.
 - **Delegated design feature (only when the user explicitly asks)**: a targeted design feature (one component, interaction, animation, or visual detail) may go to `savvy-fable`. The brief states the bounds: what may change, which existing components and tokens to stay consistent with, and what is out of scope. You still review the visual result and own acceptance.
 - For frontend styling direction, consult the `frontend-design` skill. For any chart/graph, consult `dataviz` before specifying it.
 - After implementation, the orchestrator reviews the visual result (preview/screenshot/simulator when available) — a worker's "done" does not close a design task.
@@ -70,15 +70,17 @@ Pick the cheapest tier that will get the task right the first time. Two axes: **
 | Tier | Agent | Model / effort | Use for |
 |------|-------|----------------|---------|
 | Fable | `savvy-fable` | Fable / high | "Hardest problems": very complex logic (subtle algorithms, concurrency, many interacting states), hard bugs that resist ordinary debugging or survived a Heavy investigation; targeted design features, only when the user asks (section 2) |
-| Heavy | `savvy-heavy` | Opus / xhigh | "Understand and find": unfamiliar or messy code, unclear root cause, non-obvious architecture, large contexts, anything where a wrong first approach is expensive |
-| Careful | `savvy-careful` | Opus / high | "Do it right": the approach is clear but execution is delicate. Multi-file refactors, fixes that must preserve invariants, logic with many edge cases, concurrency |
-| Medium | `savvy-medium` | Opus / medium | Standard feature work, bug fixes with a known cause, changes confined to a few files with clear requirements |
-| Light | `savvy-light` | Opus / low | Mechanical edits, renames, boilerplate, config, small isolated fixes, running builds/tests and reporting |
+| Heavy | `savvy-heavy` | Opus / high | "Understand and find": unfamiliar or messy code, unclear root cause, non-obvious architecture, large contexts, anything where a wrong first approach is expensive |
+| Careful | `savvy-careful` | Sonnet / high | "Do it right": the approach is clear but execution is delicate. Multi-file refactors, fixes that must preserve invariants, logic with many edge cases, concurrency |
+| Medium | `savvy-medium` | Sonnet / medium | Standard feature work, bug fixes with a known cause, changes confined to a few files with clear requirements |
+| Light | `savvy-light` | Haiku / medium | Mechanical edits, renames, boilerplate, config, small isolated fixes, running builds/tests and reporting |
 
 Heuristics:
 - Uncertain between two tiers → take the higher one. Exception: Fable is a reserve tier; pick it only when the task clearly meets its criteria, otherwise Heavy.
 - Heavy vs Careful is about the kind of difficulty, not the amount: insight needed → Heavy; thoroughness needed → Careful. A task that needs both is two tasks: Heavy investigates and produces a precise brief, Careful implements it.
 - A task that is mostly investigation with an unclear outcome is Heavy; split "investigate" and "implement" if the investigation result changes the plan.
+- Sonnet (Careful, Medium) is the default workhorse: most implementation work belongs there. Opus (Heavy) is for insight, not volume.
+- Light runs on Haiku: give it only tasks a brief can fully pin down (exact files, exact edits or commands). If a Light task needs a judgment call, it is Medium.
 - Never delegate final judgment (section 5) to any tier. Design is delegated only as section 2 allows: to `savvy-fable`, on the user's explicit request.
 
 ## 4. Delegate
