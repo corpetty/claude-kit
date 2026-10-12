@@ -3,7 +3,8 @@
 A fork of [johnnyvizz/claude-kit](https://github.com/johnnyvizz/claude-kit). Changes from upstream:
 
 - **savvy-flow is on by default**: `disable-model-invocation` is gone, so Claude invokes the skill itself for non-trivial implementation work instead of waiting for `/savvy-flow`.
-- **Worker tiers remapped** so Sonnet and Haiku carry most of the work: heavy = Opus / high, careful = Sonnet / high, medium = Sonnet / medium, light = Haiku / medium (it stops and reports when a task needs judgment). Fable stays the reserve tier.
+- **Worker tiers remapped** so Sonnet and Haiku carry most of the work: heavy = Opus / high, careful = Sonnet / high, medium = Sonnet / medium, light = Haiku / medium (it stops and reports when a task needs judgment). Fable stays the reserve tier, used for very hard planning and the hardest tasks.
+- **Orchestrator is Opus 5.5**: the skill pins `model: claude-opus-5-5`, whatever model the session started on.
 - **Design step** uses Anthropic's `playground` plugin (design-playground template) with `frontend-design`, instead of a `design` skill that is not published.
 - **savvy-progress** shows the new tier models for planned tasks, prices Haiku 5.5 ($0.10 / $0.50 per MTok, 5x past a 100K-token prompt) and splits out Sonnet 4.x, and gives Haiku 5.5 its 1M context window.
 

@@ -2,6 +2,7 @@
 name: savvy-flow
 description: Orchestrated delivery flow. The session model plans, owns design, delegates implementation to tiered worker subagents (savvy-fable / savvy-heavy / savvy-careful / savvy-medium / savvy-light) and adversarially reviews their output. Use by default for any non-trivial implementation request: a feature, a multi-file change or refactor, a bug that needs investigation, a new project. Skip it for questions, explanations, and small edits you can make directly. Also invoked explicitly with /savvy-flow <task>.
 argument-hint: <task description>
+model: claude-opus-5-5
 ---
 
 # Savvy Flow
@@ -15,7 +16,7 @@ If that is empty, the skill was triggered automatically: the task is the user's 
 ## 0. Preconditions
 
 - **Scope**: the flow is for work worth planning and reviewing. If the request is a question, an explanation, a one-file tweak, or anything you can finish in a couple of tool calls, do it directly and do not run the flow. When in doubt about a borderline task, say in one line that you are skipping delegation and why, then proceed.
-- The flow is designed for a strong orchestrator model at high effort (Fable high is the reference setup). Do not try to detect or verify the session's model or effort — you cannot see the effort level. Whatever the session runs on is the user's deliberate choice; just orchestrate.
+- The orchestrator is Opus 5.5: the skill's `model:` frontmatter switches the session to it while the flow runs. Fable is reserved for planning that is very hard (section 1, step 4) and for the worker tasks in section 3. Do not try to detect or verify the model or effort — you cannot see the effort level; just orchestrate.
 - Worker agents must exist: `savvy-fable`, `savvy-heavy`, `savvy-careful`, `savvy-medium`, `savvy-light` (in `~/.claude/agents/`, or shipped with the savvy-flow plugin, in which case the Agent tool lists them as `savvy-flow:savvy-careful` and so on). If the Agent tool does not list them, stop and tell the user.
 
 ## Progress bar
@@ -37,7 +38,8 @@ When delegating, pass the task's `title` verbatim as the Agent tool's `descripti
    - a clear, self-contained brief (what, where, constraints, definition of done, how to verify);
    - explicit dependencies between tasks;
    - a **tier** per task (section 3).
-4. Present the plan to the user in a compact form: numbered tasks, tier, dependency order. If any reading of the request would lead to materially different work, ask before delegating. Otherwise proceed.
+4. **Very hard planning** (an architecture with many interacting constraints, a large ambiguous scope whose decomposition hinges on subtle trade-offs, a plan where a wrong split is expensive): hand the drafting to `savvy-fable` with a planning brief. The brief gives the request, the context you gathered, the relevant files, and asks for a plan only: tasks with brief, tier, dependencies, verification, plus risks and open questions. Fable edits nothing. Treat its plan like any worker report (section 5): check it against the code, fix or return it, then own it. Routine plans you write yourself.
+5. Present the plan to the user in a compact form: numbered tasks, tier, dependency order. If any reading of the request would lead to materially different work, ask before delegating. Otherwise proceed.
 
 ## 1a. New project (greenfield)
 
@@ -71,7 +73,7 @@ Pick the cheapest tier that will get the task right the first time. Two axes: **
 
 | Tier | Agent | Model / effort | Use for |
 |------|-------|----------------|---------|
-| Fable | `savvy-fable` | Fable / high | "Hardest problems": very complex logic (subtle algorithms, concurrency, many interacting states), hard bugs that resist ordinary debugging or survived a Heavy investigation; targeted design features, only when the user asks (section 2) |
+| Fable | `savvy-fable` | Fable / high | "Hardest problems": very complex logic (subtle algorithms, concurrency, many interacting states), hard bugs that resist ordinary debugging or survived a Heavy investigation; drafting a very hard plan (section 1, step 4); targeted design features, only when the user asks (section 2) |
 | Heavy | `savvy-heavy` | Opus / high | "Understand and find": unfamiliar or messy code, unclear root cause, non-obvious architecture, large contexts, anything where a wrong first approach is expensive |
 | Careful | `savvy-careful` | Sonnet / high | "Do it right": the approach is clear but execution is delicate. Multi-file refactors, fixes that must preserve invariants, logic with many edge cases, concurrency |
 | Medium | `savvy-medium` | Sonnet / medium | Standard feature work, bug fixes with a known cause, changes confined to a few files with clear requirements |
@@ -83,7 +85,7 @@ Heuristics:
 - A task that is mostly investigation with an unclear outcome is Heavy; split "investigate" and "implement" if the investigation result changes the plan.
 - Sonnet (Careful, Medium) is the default workhorse: most implementation work belongs there. Opus (Heavy) is for insight, not volume.
 - Light runs on Haiku: give it only tasks a brief can fully pin down (exact files, exact edits or commands). If a Light task needs a judgment call, it is Medium.
-- Never delegate final judgment (section 5) to any tier. Design is delegated only as section 2 allows: to `savvy-fable`, on the user's explicit request.
+- Never delegate final judgment (section 5) to any tier, and never the ownership of the plan: Fable may draft it, you accept it. Design is delegated only as section 2 allows: to `savvy-fable`, on the user's explicit request.
 
 ## 4. Delegate
 

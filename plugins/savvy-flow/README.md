@@ -1,6 +1,6 @@
 # savvy-flow
 
-An orchestrated delivery flow for Claude Code: the session model plans, owns design, delegates implementation to tiered worker subagents and adversarially reviews what they return.
+An orchestrated delivery flow for Claude Code: the session switches to Opus 5.5 (the skill's `model:`), plans, owns design, delegates implementation to tiered worker subagents and adversarially reviews what they return.
 
 The skill is **on by default**: Claude picks it up on its own for non-trivial implementation requests (features, multi-file changes, bugs that need investigation, new projects) and skips it for questions and small edits. You can still run it explicitly with `/savvy-flow <task>` (`/savvy-flow:savvy-flow` when installed as a plugin). To go back to explicit-only, add `disable-model-invocation: true` to the frontmatter of `skills/savvy-flow/SKILL.md`.
 
@@ -11,13 +11,13 @@ The skill is **on by default**: Claude picks it up on its own for non-trivial im
 
   | Agent | Model / effort | For |
   | --- | --- | --- |
-  | `savvy-fable` | Fable / high | the hardest logic and bugs; design features on request |
+  | `savvy-fable` | Fable / high | the hardest logic and bugs; drafts very hard plans; design features on request |
   | `savvy-heavy` | Opus / high | unfamiliar code, unclear root cause |
   | `savvy-careful` | Sonnet / high | delicate but well-understood changes |
   | `savvy-medium` | Sonnet / medium | standard feature work |
   | `savvy-light` | Haiku / medium | mechanical edits, builds, tests; stops and reports when a task needs judgment |
 
-  `savvy-fable` runs on the Fable model; without access to it, change `model:` in `agents/savvy-fable.md` (say, to `opus`).
+  The orchestrator itself runs on Opus 5.5, set by `model:` in `skills/savvy-flow/SKILL.md`; edit it there to change. `savvy-fable` runs on the Fable model; without access to it, change `model:` in `agents/savvy-fable.md` (say, to `opus`).
 
 ## Design work
 
