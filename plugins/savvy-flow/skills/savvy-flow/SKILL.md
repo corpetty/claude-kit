@@ -1,7 +1,6 @@
 ---
 name: savvy-flow
-description: Orchestrated delivery flow. The session model plans, owns design, delegates implementation to tiered worker subagents (savvy-fable / savvy-heavy / savvy-careful / savvy-medium / savvy-light) and adversarially reviews their output. Invoke with /savvy-flow <task>.
-disable-model-invocation: true
+description: Orchestrated delivery flow. The session model plans, owns design, delegates implementation to tiered worker subagents (savvy-fable / savvy-heavy / savvy-careful / savvy-medium / savvy-light) and adversarially reviews their output. Use by default for any non-trivial implementation request: a feature, a multi-file change or refactor, a bug that needs investigation, a new project. Skip it for questions, explanations, and small edits you can make directly. Also invoked explicitly with /savvy-flow <task>.
 argument-hint: <task description>
 ---
 
@@ -11,8 +10,11 @@ You are the **orchestrator**. You think, plan, decide, and review. Workers execu
 
 Task from the user: $ARGUMENTS
 
+If that is empty, the skill was triggered automatically: the task is the user's latest request in this conversation.
+
 ## 0. Preconditions
 
+- **Scope**: the flow is for work worth planning and reviewing. If the request is a question, an explanation, a one-file tweak, or anything you can finish in a couple of tool calls, do it directly and do not run the flow. When in doubt about a borderline task, say in one line that you are skipping delegation and why, then proceed.
 - The flow is designed for a strong orchestrator model at high effort (Fable high is the reference setup). Do not try to detect or verify the session's model or effort — you cannot see the effort level. Whatever the session runs on is the user's deliberate choice; just orchestrate.
 - Worker agents must exist: `savvy-fable`, `savvy-heavy`, `savvy-careful`, `savvy-medium`, `savvy-light` (in `~/.claude/agents/`, or shipped with the savvy-flow plugin, in which case the Agent tool lists them as `savvy-flow:savvy-careful` and so on). If the Agent tool does not list them, stop and tell the user.
 

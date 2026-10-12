@@ -2,6 +2,7 @@
 
 A fork of [johnnyvizz/claude-kit](https://github.com/johnnyvizz/claude-kit). Changes from upstream:
 
+- **savvy-flow is on by default**: `disable-model-invocation` is gone, so Claude invokes the skill itself for non-trivial implementation work instead of waiting for `/savvy-flow`.
 - **Worker tiers remapped** so Sonnet and Haiku carry most of the work: heavy = Opus / high, careful = Sonnet / high, medium = Sonnet / medium, light = Haiku / medium (it stops and reports when a task needs judgment). Fable stays the reserve tier.
 - **Design step** uses Anthropic's `playground` plugin (design-playground template) with `frontend-design`, instead of a `design` skill that is not published.
 - **savvy-progress** shows the new tier models for planned tasks, prices Haiku 5.5 ($0.10 / $0.50 per MTok, 5x past a 100K-token prompt) and splits out Sonnet 4.x, and gives Haiku 5.5 its 1M context window.
@@ -14,7 +15,7 @@ The author's skills and mods for [Claude Code](https://claude.com/claude-code), 
 
 | Plugin | Type | What it does |
 | --- | --- | --- |
-| [savvy-flow](plugins/savvy-flow) | skill + agents | `/savvy-flow <task>`: the session model plans, delegates to tiered worker subagents and reviews their work. |
+| [savvy-flow](plugins/savvy-flow) | skill + agents | Runs automatically on non-trivial tasks (or `/savvy-flow <task>`): the session model plans, delegates to tiered worker subagents and reviews their work. |
 | [savvy-progress](plugins/savvy-progress) | mod | A progress bar above the prompt and a live agents panel. Made for savvy-flow, shows any subagents. |
 
 savvy-flow and savvy-progress work on their own and light up together: with both installed, the flow drives the bar and workers report their progress to the panel.

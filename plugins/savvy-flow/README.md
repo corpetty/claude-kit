@@ -1,6 +1,8 @@
 # savvy-flow
 
-An orchestrated delivery flow for Claude Code. Run `/savvy-flow <task>` (`/savvy-flow:savvy-flow` when installed as a plugin): the session model plans, owns design, delegates implementation to tiered worker subagents and adversarially reviews what they return.
+An orchestrated delivery flow for Claude Code: the session model plans, owns design, delegates implementation to tiered worker subagents and adversarially reviews what they return.
+
+The skill is **on by default**: Claude picks it up on its own for non-trivial implementation requests (features, multi-file changes, bugs that need investigation, new projects) and skips it for questions and small edits. You can still run it explicitly with `/savvy-flow <task>` (`/savvy-flow:savvy-flow` when installed as a plugin). To go back to explicit-only, add `disable-model-invocation: true` to the frontmatter of `skills/savvy-flow/SKILL.md`.
 
 ## What ships
 
